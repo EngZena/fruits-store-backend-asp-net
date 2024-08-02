@@ -1,0 +1,6 @@
+@fruits_store_backend_asp_net_HostAddress = http://localhost:5242
+
+GET {{fruits_store_backend_asp_net_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
