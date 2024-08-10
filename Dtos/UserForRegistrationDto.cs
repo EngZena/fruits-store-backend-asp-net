@@ -15,35 +15,17 @@ namespace FruitsStoreBackendASPNET.Dtos
 
         public UserForRegistrationDto()
         {
-            if (Email == null)
-            {
-                Email = "";
-            }
+            Email ??= "";
 
-            if (Password == null)
-            {
-                Password = "";
-            }
+            Password ??= "";
 
-            if (PasswordConfirm == null)
-            {
-                PasswordConfirm = "";
-            }
+            PasswordConfirm ??= "";
 
-            if (FirstName == null)
-            {
-                FirstName = "";
-            }
+            FirstName ??= "";
 
-            if (LastName == null)
-            {
-                LastName = "";
-            }
+            LastName ??= "";
 
-            if (Gender == null)
-            {
-                Gender = "";
-            }
+            Gender ??= "";
 
         }
 
