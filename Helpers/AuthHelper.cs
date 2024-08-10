@@ -4,15 +4,10 @@ using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 
 namespace FruitsStoreBackendASPNET.Helpers
 {
-    public class AuthHelper
+    public class AuthHelper(IConfiguration configuration)
     {
-        private readonly DataContextDapper _dapper;
-        private readonly IConfiguration _configuration;
-        public AuthHelper(IConfiguration configuration)
-        {
-            _configuration = configuration;
-            _dapper = new DataContextDapper(configuration);
-        }
+        private readonly DataContextDapper _dapper = new DataContextDapper(configuration);
+        private readonly IConfiguration _configuration = configuration;
 
         public byte[] GetPasswordHash(string password, byte[] passwordSalt)
         {

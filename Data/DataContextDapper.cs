@@ -6,14 +6,9 @@ using Microsoft.Data.SqlClient;
 
 namespace FruitsStoreBackendASPNET.Data
 {
-    public class DataContextDapper
+    public class DataContextDapper(IConfiguration configuration)
     {
-        private readonly IConfiguration _configuration;
-
-        public DataContextDapper(IConfiguration configuration)
-        {
-            _configuration = configuration;
-        }
+        private readonly IConfiguration _configuration = configuration;
 
         public IEnumerable<T> LoadData<T>(string sql)
         {
