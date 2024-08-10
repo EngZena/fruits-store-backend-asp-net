@@ -11,22 +11,10 @@ namespace FruitsStoreBackendASPNET.Models
 
         public User()
         {
-            if (FirstName == null)
-            {
-                FirstName = "";
-            }
-            if (LastName == null)
-            {
-                LastName = "";
-            }
-            if (Email == null)
-            {
-                Email = "";
-            }
-            if (Gender == null)
-            {
-                Gender = "";
-            }
+            FirstName ??= "";
+            LastName ??= "";
+            Email ??= "";
+            Gender ??= "";
         }
     }
 }
