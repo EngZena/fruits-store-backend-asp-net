@@ -22,5 +22,12 @@ namespace FruitsStoreBackendASPNET.Data
             );
             return dbConnection.Query<T>(sql);
         }
+        public bool ExecuteSql(string sql)
+        {
+            IDbConnection dbConnection = new SqlConnection(
+                _configuration.GetConnectionString("DefaultConnection")
+            );
+            return dbConnection.Execute(sql) > 0;
+        }
     }
 }
