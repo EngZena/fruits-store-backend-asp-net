@@ -1,6 +1,9 @@
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text;
 using FruitsStoreBackendASPNET.Data;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+using Microsoft.IdentityModel.Tokens;
 
 namespace FruitsStoreBackendASPNET.Helpers
 {
@@ -11,8 +14,9 @@ namespace FruitsStoreBackendASPNET.Helpers
 
         public byte[] GetPasswordHash(string password, byte[] passwordSalt)
         {
-            string passwordSaltPlusString = _configuration.GetSection("AppSettings:PasswordKey").Value
-                    + Convert.ToBase64String(passwordSalt);
+            string passwordSaltPlusString =
+                _configuration.GetSection("AppSettings:PasswordKey").Value
+                + Convert.ToBase64String(passwordSalt);
 
             return KeyDerivation.Pbkdf2(
                 password: password,
@@ -22,6 +26,5 @@ namespace FruitsStoreBackendASPNET.Helpers
                 numBytesRequested: 256 / 8
             );
         }
-
     }
 }
