@@ -26,8 +26,6 @@ namespace FruitsStoreBackendASPNET.Dtos
             LastName ??= "";
 
             Gender ??= "";
-
         }
-
     }
 }
