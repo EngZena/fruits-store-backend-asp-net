@@ -3,6 +3,7 @@ using System.Security.Cryptography;
 using FruitsStoreBackendASPNET.Data;
 using FruitsStoreBackendASPNET.Dtos;
 using FruitsStoreBackendASPNET.Helpers;
+using FruitsStoreBackendASPNET.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
@@ -104,6 +105,44 @@ namespace FruitsStoreBackendASPNET.Controllers
             }
             throw new Exception(
                 "There is a mismatch between the password and the confirm passwords."
+            );
+        }
+
+        [AllowAnonymous]
+        [HttpPost("Login")]
+        public IActionResult Login(UserForLoginDto userForLoginDto)
+        {
+              string sqlForHashAndSalt =
+                @"SELECT [PasswordHash], [PasswordSalt] 
+                FROM FruitsStoreBackendSchema.Auth WHERE Email = '"
+                + userForLoginDto.Email
+                + "'";
+
+            UserForLoginConfirmationDetailsDto userForLoginConfirmationDetailsDto =
+                _dapper.LoadDataSingle<UserForLoginConfirmationDetailsDto>(sqlForHashAndSalt);
+
+            byte[] passwordHash = _authHelper.GetPasswordHash(
+                userForLoginDto.Password,
+                userForLoginConfirmationDetailsDto.PasswordSalt
+            );
+
+            for (int index = 0; index < passwordHash.Length; index++)
+            {
+                if (passwordHash[index] != userForLoginConfirmationDetailsDto.PasswordHash[index])
+                {
+                    return StatusCode(401, "Incorrect Password"); 
+                }
+            }
+
+            string userIdSql =
+                @"SELECT UserId FROM FruitsStoreBackendSchema.Users WHERE Email = '"
+                + userForLoginDto.Email
+                + "'";
+
+            int userId = _dapper.LoadDataSingle<int>(userIdSql);
+
+            return Ok(
+                new Dictionary<string, string> { { "token", _authHelper.CreateToken(userId) } }
             );
         }
     }
