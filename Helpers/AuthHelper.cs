@@ -27,7 +27,7 @@ namespace FruitsStoreBackendASPNET.Helpers
             );
         }
 
-        public string CreateToken(int userId)
+        public string CreateToken(Guid userId)
         {
             Claim[] claims = [new Claim("userId", userId.ToString())];
 
