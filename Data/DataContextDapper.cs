@@ -45,5 +45,13 @@ namespace FruitsStoreBackendASPNET.Data
 
             return rowsAffected > 0;
         }
+
+        public T LoadDataSingle<T>(string sql)
+        {
+            IDbConnection dbConnection = new SqlConnection(
+               _configuration.GetConnectionString("DefaultConnection")
+            );
+            return dbConnection.QuerySingle<T>(sql);
+        }
     }
 }
