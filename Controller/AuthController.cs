@@ -139,7 +139,7 @@ namespace FruitsStoreBackendASPNET.Controllers
                 + userForLoginDto.Email
                 + "'";
 
-            int userId = _dapper.LoadDataSingle<int>(userIdSql);
+            Guid userId = _dapper.LoadDataSingle<Guid>(userIdSql);
 
             return Ok(
                 new Dictionary<string, string> { { "token", _authHelper.CreateToken(userId) } }
