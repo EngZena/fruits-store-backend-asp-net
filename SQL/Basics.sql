@@ -12,7 +12,7 @@ GO
     )
 GO
     CREATE TABLE [FruitsStoreBackendSchema].Users (
-        UserId INT IDENTITY(1, 1) PRIMARY KEY,
+        UserId UNIQUEIDENTIFIER PRIMARY KEY DEFAULT NEWID(),
         FirstName NVARCHAR(50),
         LastName NVARCHAR(50),
         Email NVARCHAR(50),
