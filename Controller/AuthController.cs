@@ -109,10 +109,92 @@ namespace FruitsStoreBackendASPNET.Controllers
         }
 
         [AllowAnonymous]
+        [HttpPost("SignUp")]
+        public IActionResult SignUp(UserForSignUpDto userForSignUpDto)
+        {
+            // Verify whether the email address is registered previously
+
+            string SQlCheckIfTheUserExists =
+                "Select Email from FruitsStoreBackendSchema.Auth WHERE Email  = '"
+                + userForSignUpDto.Email
+                + "'";
+            IEnumerable<string> existingUsers = _dapper.LoadData<string>(SQlCheckIfTheUserExists);
+
+            if (existingUsers.Count() == 0)
+            {
+                byte[] passwordSalt = new byte[128 / 8];
+                using (RandomNumberGenerator rng = RandomNumberGenerator.Create())
+                {
+                    rng.GetNonZeroBytes(passwordSalt);
+                }
+
+                byte[] passwordHash = _authHelper.GetPasswordHash(
+                    userForSignUpDto.Password,
+                    passwordSalt
+                );
+
+                string sqlAddAuth =
+                    @"INSERT INTO FruitsStoreBackendSchema.AUTH ([Email],
+                                        [passwordHash],
+                                        [passwordSalt]) VALUES('"
+                    + userForSignUpDto.Email
+                    + "', @passwordHash, @passwordSalt)";
+
+                List<SqlParameter> SqlParameters = new List<SqlParameter>();
+
+                SqlParameter passwordSaltParameter = new SqlParameter(
+                    "@PasswordSalt",
+                    SqlDbType.VarBinary
+                );
+                passwordSaltParameter.Value = passwordSalt;
+
+                SqlParameter passwordHashParameter = new SqlParameter(
+                    "@PasswordHash",
+                    SqlDbType.VarBinary
+                );
+                passwordHashParameter.Value = passwordHash;
+
+                SqlParameters.Add(passwordHashParameter);
+                SqlParameters.Add(passwordSaltParameter);
+
+                if (_dapper.ExecuteSqlWithListParameters(sqlAddAuth, SqlParameters))
+                {
+                    string SQLAddAUser =
+                        @"INSERT INTO FruitsStoreBackendSchema.Users(
+                                     [Email] 
+                                    ) VALUES("
+                        + "'"
+                        + userForSignUpDto.Email
+                        + "')";
+
+                    if (_dapper.ExecuteSql(SQLAddAUser))
+                    {
+                        string userIdSql =
+                            @"SELECT UserId FROM FruitsStoreBackendSchema.Users WHERE Email = '"
+                            + userForSignUpDto.Email
+                            + "'";
+
+                        Guid userId = _dapper.LoadDataSingle<Guid>(userIdSql);
+
+                        return Ok(
+                            new Dictionary<string, string>
+                            {
+                                { "token", _authHelper.CreateToken(userId) },
+                            }
+                        );
+                    }
+                    throw new Exception("Failed to Add User");
+                }
+                throw new Exception("Failed to Create User");
+            }
+            throw new Exception("There is already a user with this email.");
+        }
+
+        [AllowAnonymous]
         [HttpPost("Login")]
         public IActionResult Login(UserForLoginDto userForLoginDto)
         {
-              string sqlForHashAndSalt =
+            string sqlForHashAndSalt =
                 @"SELECT [PasswordHash], [PasswordSalt] 
                 FROM FruitsStoreBackendSchema.Auth WHERE Email = '"
                 + userForLoginDto.Email
@@ -130,7 +212,7 @@ namespace FruitsStoreBackendASPNET.Controllers
             {
                 if (passwordHash[index] != userForLoginConfirmationDetailsDto.PasswordHash[index])
                 {
-                    return StatusCode(401, "Incorrect Password"); 
+                    return StatusCode(401, "Incorrect Password");
                 }
             }
 
