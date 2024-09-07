@@ -26,5 +26,34 @@ namespace FruitsStoreBackendASPNET.Helpers
                 numBytesRequested: 256 / 8
             );
         }
+
+        public string CreateToken(int userId)
+        {
+            Claim[] claims = [new Claim("userId", userId.ToString())];
+
+            string? tokenKeyString = _configuration.GetSection("AppSettings:TokenKey").Value;
+
+            SymmetricSecurityKey tokenKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(tokenKeyString ?? "")
+            );
+
+            SigningCredentials credentials = new SigningCredentials(
+                tokenKey,
+                SecurityAlgorithms.HmacSha512Signature
+            );
+
+            SecurityTokenDescriptor descriptor = new SecurityTokenDescriptor()
+            {
+                Subject = new ClaimsIdentity(claims),
+                SigningCredentials = credentials,
+                Expires = DateTime.Now.AddHours(2),
+            };
+
+            JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
+
+            SecurityToken token = tokenHandler.CreateToken(descriptor);
+
+            return tokenHandler.WriteToken(token);
+        }
     }
 }
