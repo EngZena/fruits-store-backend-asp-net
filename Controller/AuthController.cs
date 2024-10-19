@@ -82,7 +82,8 @@ namespace FruitsStoreBackendASPNET.Controllers
                                      [LastName],   
                                      [Email],   
                                      [Gender],   
-                                     [Active]
+                                     [Active],
+                                     [CreatedAt]
                                     ) VALUES("
                             + "'"
                             + userForRegistrationDto.FirstName
@@ -92,7 +93,10 @@ namespace FruitsStoreBackendASPNET.Controllers
                             + userForRegistrationDto.Email
                             + "',  '"
                             + userForRegistrationDto.Gender
-                            + "' , 1)";
+                            + "' , 1"
+                            + ",  '"
+                            + DateTime.Now
+                            +"')";
                         if (_dapper.ExecuteSql(SQLAddAUser))
                         {
                             return Ok();
