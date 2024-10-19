@@ -53,5 +53,24 @@ namespace FruitsStoreBackendASPNET.Controllers
 
             return BadRequest("Unable to add fruit. User ID not found in the token.");
         }
+
+        [HttpPatch("EditFruit")]
+        public IActionResult EditFruit(Fruit fruit)
+        {
+            Fruit? fruitDb = _fruitRepository.GetSingleFruit(fruit.FruitId);
+            if (fruitDb != null)
+            {
+                fruitDb.Name = fruit.Name;
+                fruitDb.FruitType = fruit.FruitType;
+                fruitDb.Price = fruit.Price;
+                fruitDb.ImageBase64 = fruit.ImageBase64;
+                if (_fruitRepository.SaveChanges())
+                {
+                    return Ok("Fruit updated successfully!");
+                }
+                throw new Exception("Failed to Update Fruit");
+            }
+            throw new Exception("Failed to Get Fruit");
+        }
     }
 }
