@@ -28,5 +28,12 @@ namespace FruitsStoreBackendASPNET.Controllers
             IEnumerable<Fruit> fruits = _fruitRepository.GetFruits();
             return fruits;
         }
+
+        [HttpGet("GetSingleFruit/{FruitId}")]
+        public Fruit GetSingleFruit(Guid FruitId)
+        {
+            return _fruitRepository.GetSingleFruit(FruitId);
+        }
+
     }
 }
