@@ -17,7 +17,8 @@ GO
         LastName NVARCHAR(50),
         Email NVARCHAR(50),
         Gender NVARCHAR(50),
-        Active BIT
+        Active BIT,
+        CreatedAt DATETIME2
     );
 
 GO

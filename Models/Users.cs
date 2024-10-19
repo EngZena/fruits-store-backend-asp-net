@@ -10,6 +10,7 @@ namespace FruitsStoreBackendASPNET.Models
         public string Email { get; set; }
         public Gender Gender { get; set; }
         public bool Active { get; set; }
+        public DateTime CreatedAt { get; set; }
 
         public User()
         {
