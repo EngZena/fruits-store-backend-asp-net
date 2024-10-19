@@ -10,8 +10,7 @@ namespace FruitsStoreBackendASPNET.Controllers
     [Authorize]
     [ApiController]
     [Route("[controller]")]
-    public class FruitController(IFruitRepository fruitRepository)
-        : ControllerBase
+    public class FruitController(IFruitRepository fruitRepository) : ControllerBase
     {
         IFruitRepository _fruitRepository = fruitRepository;
 
@@ -35,5 +34,24 @@ namespace FruitsStoreBackendASPNET.Controllers
             return _fruitRepository.GetSingleFruit(FruitId);
         }
 
+        [HttpPost("AddFruit")]
+        public IActionResult AddFruit(FruitDto fruitDto)
+        {
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+            if (userId != null && Guid.TryParse(userId, out Guid userGuid))
+            {
+                fruitDto.AddedBy = userGuid;
+                Fruit fruit = _mapper.Map<Fruit>(fruitDto);
+                fruit.CreatedAt = DateTime.UtcNow;
+                fruit.UpdatedAt = DateTime.UtcNow;
+                if (_fruitRepository.AddEntity(fruit))
+                {
+                    return Ok("Fruit added successfully!");
+                }
+                return Ok("Fruit added successfully");
+            }
+
+            return BadRequest("Unable to add fruit. User ID not found in the token.");
+        }
     }
 }
