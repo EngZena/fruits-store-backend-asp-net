@@ -72,5 +72,22 @@ namespace FruitsStoreBackendASPNET.Controllers
             }
             throw new Exception("Failed to Get Fruit");
         }
+        
+        [HttpDelete("DeleteFruit/{FruitId}")]
+        public IActionResult DeleteFruit(Guid FruitId)
+        {
+            Fruit? fruitDb = _fruitRepository.GetSingleFruit(FruitId);
+            if (fruitDb != null)
+            {
+                _fruitRepository.RemoveEntity<Fruit>(fruitDb);
+
+                if (_fruitRepository.SaveChanges())
+                {
+                    return Ok("Fruit deleted successfully!");
+                }
+                throw new Exception("Failed to Delete Fruit");
+            }
+            throw new Exception("Failed to Get Fruit");
+        }
     }
 }
