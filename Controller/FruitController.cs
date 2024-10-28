@@ -24,14 +24,19 @@ namespace FruitsStoreBackendASPNET.Controllers
         [HttpGet("GetFruits")]
         public IEnumerable<Fruit> GetFruits()
         {
-            IEnumerable<Fruit> fruits = _fruitRepository.GetFruits();
-            return fruits;
+            return _fruitRepository.GetFruits();
         }
 
         [HttpGet("GetSingleFruit/{FruitId}")]
         public Fruit GetSingleFruit(Guid FruitId)
         {
             return _fruitRepository.GetSingleFruit(FruitId);
+        }
+
+        [HttpGet("GetFruitsCreatedByUserId/{UserId}")]
+        public IEnumerable<Fruit> GetFruitsCreatedByUserId(Guid UserId)
+        {
+            return _fruitRepository.GetFruitsCreatedByUserId(UserId);
         }
 
         [HttpPost("AddFruit")]
@@ -72,7 +77,7 @@ namespace FruitsStoreBackendASPNET.Controllers
             }
             throw new Exception("Failed to Get Fruit");
         }
-        
+
         [HttpDelete("DeleteFruit/{FruitId}")]
         public IActionResult DeleteFruit(Guid FruitId)
         {

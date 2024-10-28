@@ -12,6 +12,8 @@ namespace FruitsStoreBackendASPNET.Repositories
 
         public IEnumerable<Fruit> GetFruits();
 
+        public IEnumerable<Fruit> GetFruitsCreatedByUserId(Guid UserId);
+
         public Fruit GetSingleFruit(Guid FruitId);
     }
 }

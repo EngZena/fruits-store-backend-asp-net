@@ -23,6 +23,12 @@ namespace FruitsStoreBackendASPNET.Repositories
             return Fruits;
         }
 
+        public IEnumerable<Fruit> GetFruitsCreatedByUserId(Guid UserId)
+        {
+            IEnumerable<Fruit> Fruits = _entityFramework.Fruits.Where(fruit => fruit.AddedBy == UserId).ToList<Fruit>();
+            return Fruits;
+        }
+
         public Fruit GetSingleFruit(Guid FruitId)
         {
             Fruit? Fruit = _entityFramework
