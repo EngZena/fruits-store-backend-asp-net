@@ -1,4 +1,5 @@
 using FruitsStoreBackendASPNET.Data;
+using FruitsStoreBackendASPNET.Enums;
 using FruitsStoreBackendASPNET.Models;
 
 namespace FruitsStoreBackendASPNET.Repositories
@@ -21,6 +22,11 @@ namespace FruitsStoreBackendASPNET.Repositories
         {
             IEnumerable<Fruit> Fruits = _entityFramework.Fruits.ToList<Fruit>();
             return Fruits;
+        }
+
+        public IEnumerable<Fruit> GetFruitsByType(FruitType FruitType)
+        {
+            return _entityFramework.Fruits.Where(f => f.FruitType == FruitType).ToList<Fruit>();
         }
 
         public IEnumerable<Fruit> GetFruitsCreatedByUserId(Guid UserId)
