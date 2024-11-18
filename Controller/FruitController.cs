@@ -1,5 +1,6 @@
 using AutoMapper;
 using FruitsStoreBackendASPNET.Dtos;
+using FruitsStoreBackendASPNET.Enums;
 using FruitsStoreBackendASPNET.Models;
 using FruitsStoreBackendASPNET.Repositories;
 using Microsoft.AspNetCore.Authorization;
@@ -49,11 +50,14 @@ namespace FruitsStoreBackendASPNET.Controllers
                 Fruit fruit = _mapper.Map<Fruit>(fruitDto);
                 fruit.CreatedAt = DateTime.UtcNow;
                 fruit.UpdatedAt = DateTime.UtcNow;
+                if (!Enum.IsDefined(typeof(FruitType), fruit.FruitType))
+                {
+                    return BadRequest("Invalid fruit type.");
+                }
                 if (_fruitRepository.AddEntity(fruit))
                 {
                     return Ok("Fruit added successfully!");
                 }
-                return Ok("Fruit added successfully");
             }
 
             return BadRequest("Unable to add fruit. User ID not found in the token.");
