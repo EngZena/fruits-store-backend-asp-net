@@ -1,3 +1,4 @@
+using FruitsStoreBackendASPNET.Enums;
 using FruitsStoreBackendASPNET.Models;
 
 namespace FruitsStoreBackendASPNET.Repositories
@@ -11,6 +12,7 @@ namespace FruitsStoreBackendASPNET.Repositories
         public void RemoveEntity<T>(T entityToRemove);
 
         public IEnumerable<Fruit> GetFruits();
+        public IEnumerable<Fruit> GetFruitsByType(FruitType FruitTypeId);
 
         public IEnumerable<Fruit> GetFruitsCreatedByUserId(Guid UserId);
 
