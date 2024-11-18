@@ -28,6 +28,17 @@ namespace FruitsStoreBackendASPNET.Controllers
             return _fruitRepository.GetFruits();
         }
 
+
+        [HttpGet("GetFruitsByType/{FruitType}")]
+        public IActionResult GetFruitsByType(string FruitType)
+        {
+            if (!Enum.TryParse<FruitType>(FruitType, true, out var fruitType))
+            {
+                return BadRequest("Invalid fruit type provided.");
+            }
+            return Ok(_fruitRepository.GetFruitsByType(fruitType));
+        }
+
         [HttpGet("GetSingleFruit/{FruitId}")]
         public Fruit GetSingleFruit(Guid FruitId)
         {
