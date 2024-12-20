@@ -31,7 +31,9 @@ namespace FruitsStoreBackendASPNET.Repositories
 
         public IEnumerable<Fruit> GetFruitsCreatedByUserId(Guid UserId)
         {
-            IEnumerable<Fruit> Fruits = _entityFramework.Fruits.Where(fruit => fruit.AddedBy == UserId).ToList<Fruit>();
+            IEnumerable<Fruit> Fruits = _entityFramework
+                .Fruits.Where(fruit => fruit.AddedBy == UserId)
+                .ToList<Fruit>();
             return Fruits;
         }
 

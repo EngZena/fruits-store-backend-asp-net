@@ -27,7 +27,7 @@ namespace FruitsStoreBackendASPNET.Data
         public bool ExecuteSqlWithListParameters(string sql, List<SqlParameter> parameters)
         {
             SqlCommand commandWithParam = new SqlCommand(sql);
-            foreach(SqlParameter parameter in parameters)
+            foreach (SqlParameter parameter in parameters)
             {
                 commandWithParam.Parameters.Add(parameter);
             }
@@ -49,7 +49,7 @@ namespace FruitsStoreBackendASPNET.Data
         public T LoadDataSingle<T>(string sql)
         {
             IDbConnection dbConnection = new SqlConnection(
-               _configuration.GetConnectionString("DefaultConnection")
+                _configuration.GetConnectionString("DefaultConnection")
             );
             return dbConnection.QuerySingle<T>(sql);
         }
