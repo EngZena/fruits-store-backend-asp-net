@@ -28,7 +28,6 @@ namespace FruitsStoreBackendASPNET.Controllers
             return _fruitRepository.GetFruits();
         }
 
-
         [HttpGet("GetFruitsByType/{FruitType}")]
         public IActionResult GetFruitsByType(string FruitType)
         {

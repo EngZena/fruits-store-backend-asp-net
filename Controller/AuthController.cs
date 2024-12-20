@@ -96,7 +96,7 @@ namespace FruitsStoreBackendASPNET.Controllers
                             + "' , 1"
                             + ",  '"
                             + DateTime.Now
-                            +"')";
+                            + "')";
                         if (_dapper.ExecuteSql(SQLAddAUser))
                         {
                             return Ok();
