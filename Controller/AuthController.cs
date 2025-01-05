@@ -229,5 +229,23 @@ namespace FruitsStoreBackendASPNET.Controllers
                 }
             );
         }
+
+        [HttpPost("RequestResetPassword")]
+        public IActionResult RequestResetPassword(string userEmail)
+        {
+            Guid userId = _authService.GetUserGuidByEmail(userEmail);
+            if (userId == Guid.Empty)
+            {
+                return StatusCode(404, "The Provided Email is Invalid");
+            }
+            else
+            {
+                if (!_authService.IsNumberOfAttemptsWithinLimit(userId))
+                {
+                    return StatusCode(404, "Please try after one hour");
+                }
+                return Ok(_authHelper.CreateResetPasswordGUID(userId));
+            }
+        }
     }
 }
