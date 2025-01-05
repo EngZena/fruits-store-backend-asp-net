@@ -4,6 +4,7 @@ using FruitsStoreBackendASPNET.Data;
 using FruitsStoreBackendASPNET.Dtos;
 using FruitsStoreBackendASPNET.Helpers;
 using FruitsStoreBackendASPNET.Models;
+using FruitsStoreBackendASPNET.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
@@ -18,6 +19,7 @@ namespace FruitsStoreBackendASPNET.Controllers
         private readonly DataContextDapper _dapper = new DataContextDapper(configuration);
 
         private readonly AuthHelper _authHelper = new AuthHelper(configuration);
+        private readonly AuthService _authService = new AuthService(configuration);
 
         [AllowAnonymous]
         [HttpPost("Register")]
@@ -173,17 +175,12 @@ namespace FruitsStoreBackendASPNET.Controllers
 
                     if (_dapper.ExecuteSql(SQLAddAUser))
                     {
-                        string userIdSql =
-                            @"SELECT UserId FROM FruitsStoreBackendSchema.Users WHERE Email = '"
-                            + userForSignUpDto.Email
-                            + "'";
-
-                        Guid userId = _dapper.LoadDataSingle<Guid>(userIdSql);
+                        Guid userId = _authService.GetUserGuidByEmail(userForSignUpDto.Email);
 
                         return Ok(
                             new Dictionary<string, string>
                             {
-                                { "token", _authHelper.CreateToken(userId) },
+                                { "token", _authHelper.CreateLoginAndSignUpToken(userId) },
                             }
                         );
                     }
@@ -206,7 +203,10 @@ namespace FruitsStoreBackendASPNET.Controllers
 
             UserForLoginConfirmationDetailsDto userForLoginConfirmationDetailsDto =
                 _dapper.LoadDataSingle<UserForLoginConfirmationDetailsDto>(sqlForHashAndSalt);
-
+            if (userForLoginConfirmationDetailsDto == null)
+            {
+                return StatusCode(400, "Incorrect Email");
+            }
             byte[] passwordHash = _authHelper.GetPasswordHash(
                 userForLoginDto.Password,
                 userForLoginConfirmationDetailsDto.PasswordSalt
@@ -220,15 +220,13 @@ namespace FruitsStoreBackendASPNET.Controllers
                 }
             }
 
-            string userIdSql =
-                @"SELECT UserId FROM FruitsStoreBackendSchema.Users WHERE Email = '"
-                + userForLoginDto.Email
-                + "'";
-
-            Guid userId = _dapper.LoadDataSingle<Guid>(userIdSql);
+            Guid userId = _authService.GetUserGuidByEmail(userForLoginDto.Email);
 
             return Ok(
-                new Dictionary<string, string> { { "token", _authHelper.CreateToken(userId) } }
+                new Dictionary<string, string>
+                {
+                    { "token", _authHelper.CreateLoginAndSignUpToken(userId) },
+                }
             );
         }
     }

@@ -27,11 +27,20 @@ namespace FruitsStoreBackendASPNET.Helpers
             );
         }
 
-        public string CreateToken(Guid userId)
+        public string CreateLoginAndSignUpToken(Guid userId)
+        {
+            return CreateToken(userId, "AppSettings:TokenKey", 2);
+        }
+
+        private string CreateToken(
+            Guid userId,
+            string tokenKeyStringParameter,
+            int ExpiryOfTheToken
+        )
         {
             Claim[] claims = [new Claim("userId", userId.ToString())];
 
-            string? tokenKeyString = _configuration.GetSection("AppSettings:TokenKey").Value;
+            string? tokenKeyString = _configuration.GetSection(tokenKeyStringParameter).Value;
 
             SymmetricSecurityKey tokenKey = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(tokenKeyString ?? "")
@@ -46,7 +55,7 @@ namespace FruitsStoreBackendASPNET.Helpers
             {
                 Subject = new ClaimsIdentity(claims),
                 SigningCredentials = credentials,
-                Expires = DateTime.Now.AddHours(2),
+                Expires = DateTime.Now.AddHours(ExpiryOfTheToken),
             };
 
             JwtSecurityTokenHandler tokenHandler = new JwtSecurityTokenHandler();
