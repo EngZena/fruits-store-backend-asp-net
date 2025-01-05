@@ -1,7 +1,9 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using FruitsStoreBackendASPNET.Data;
+using FruitsStoreBackendASPNET.Services;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.IdentityModel.Tokens;
 
@@ -11,6 +13,7 @@ namespace FruitsStoreBackendASPNET.Helpers
     {
         private readonly DataContextDapper _dapper = new DataContextDapper(configuration);
         private readonly IConfiguration _configuration = configuration;
+        private readonly AuthService _authService = new AuthService(configuration);
 
         public byte[] GetPasswordHash(string password, byte[] passwordSalt)
         {
@@ -30,6 +33,20 @@ namespace FruitsStoreBackendASPNET.Helpers
         public string CreateLoginAndSignUpToken(Guid userId)
         {
             return CreateToken(userId, "AppSettings:TokenKey", 2);
+        }
+
+        public Guid CreateResetPasswordGUID(Guid userId)
+        {
+            var Token = CreateToken(userId, "AppSettings:ResetPasswordToken", 1);
+            string combined = Token + Guid.NewGuid().ToString();
+            using SHA256 sha256Hash = SHA256.Create();
+            byte[] hash = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(combined));
+
+            byte[] guidBytes = new byte[16];
+            Array.Copy(hash, guidBytes, 16);
+            Guid newToken = new Guid(guidBytes);
+            _authService.SaveResetGuidInDataBase(userId, newToken);
+            return newToken;
         }
 
         private string CreateToken(
