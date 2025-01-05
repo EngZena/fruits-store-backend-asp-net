@@ -34,3 +34,13 @@ GO
         UpdatedAt DATETIME NOT NULL DEFAULT GETDATE()
     )
 GO
+
+    CREATE TABLE [FruitsStoreBackendSchema].RequestResetPassword(
+        UserId UNIQUEIDENTIFIER PRIMARY KEY,
+        Token VARBINARY(MAX),
+        Reset_GUID UNIQUEIDENTIFIER NOT NULL,
+        CreatedAt DATETIME NOT NULL DEFAULT GETDATE(),
+        Number_Of_Attempts INT NOT NULL,
+        IS_VALID BIT NOT NULL,
+    )
+GO
