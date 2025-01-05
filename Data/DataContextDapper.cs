@@ -51,7 +51,7 @@ namespace FruitsStoreBackendASPNET.Data
             IDbConnection dbConnection = new SqlConnection(
                 _configuration.GetConnectionString("DefaultConnection")
             );
-            return dbConnection.QuerySingle<T>(sql);
+            return dbConnection.QueryFirstOrDefault<T>(sql);
         }
     }
 }
