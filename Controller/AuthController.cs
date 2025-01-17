@@ -128,42 +128,7 @@ namespace FruitsStoreBackendASPNET.Controllers
 
             if (existingUsers.Count() == 0)
             {
-                byte[] passwordSalt = new byte[128 / 8];
-                using (RandomNumberGenerator rng = RandomNumberGenerator.Create())
-                {
-                    rng.GetNonZeroBytes(passwordSalt);
-                }
-
-                byte[] passwordHash = _authHelper.GetPasswordHash(
-                    userForSignUpDto.Password,
-                    passwordSalt
-                );
-
-                string sqlAddAuth =
-                    @"INSERT INTO FruitsStoreBackendSchema.AUTH ([Email],
-                                        [passwordHash],
-                                        [passwordSalt]) VALUES('"
-                    + userForSignUpDto.Email
-                    + "', @passwordHash, @passwordSalt)";
-
-                List<SqlParameter> SqlParameters = new List<SqlParameter>();
-
-                SqlParameter passwordSaltParameter = new SqlParameter(
-                    "@PasswordSalt",
-                    SqlDbType.VarBinary
-                );
-                passwordSaltParameter.Value = passwordSalt;
-
-                SqlParameter passwordHashParameter = new SqlParameter(
-                    "@PasswordHash",
-                    SqlDbType.VarBinary
-                );
-                passwordHashParameter.Value = passwordHash;
-
-                SqlParameters.Add(passwordHashParameter);
-                SqlParameters.Add(passwordSaltParameter);
-
-                if (_dapper.ExecuteSqlWithListParameters(sqlAddAuth, SqlParameters))
+                if (_authHelper.CreateHashPassword(userForSignUpDto, "SignUp"))
                 {
                     string SQLAddAUser =
                         @"INSERT INTO FruitsStoreBackendSchema.Users(
