@@ -19,11 +19,11 @@ namespace FruitsStoreBackendASPNET.Services
 
         public bool SaveResetGuidInDataBase(Guid userId, Guid resetGuid)
         {
-            var SQL_Number_Of_Attempts =
+            var SQL_Number_Of_Attempts_And_UserId =
                 @"SELECT Number_Of_Attempts FROM FruitsStoreBackendSchema.RequestResetPassword WHERE UserId = '"
                 + userId
                 + "'";
-            int Number_Of_Attempts = _dapper.LoadDataSingle<int>(SQL_Number_Of_Attempts);
+            int Number_Of_Attempts = _dapper.LoadDataSingle<int>(SQL_Number_Of_Attempts_And_UserId);
 
             var sql_statement =
                 @"IF EXISTS (SELECT Number_Of_Attempts FROM FruitsStoreBackendSchema.RequestResetPassword WHERE UserId = '"
@@ -87,7 +87,7 @@ namespace FruitsStoreBackendASPNET.Services
                 if (Number_Of_Attempts_And_CreatedAt.CreatedAt < DateTime.UtcNow.AddHours(-2))
                 {
                     var updateSql =
-                        @"Update FruitsStoreBackendSchema.RequestResetPassword  SET  Number_Of_Attempts = 1 WHERE UserId = '"
+                        @"Update FruitsStoreBackendSchema.RequestResetPassword  SET  Number_Of_Attempts = 0 WHERE UserId = '"
                         + userId
                         + "'";
                     _dapper.ExecuteSql(updateSql);
@@ -97,6 +97,32 @@ namespace FruitsStoreBackendASPNET.Services
                 }
                 return Number_Of_Attempts_And_CreatedAt.Number_Of_Attempts < 5;
             }
+        }
+
+        public Guid GetResetPasswordUserGuidByUserId(Guid userId)
+        {
+            string userIdSql =
+                @"SELECT UserId FROM FruitsStoreBackendSchema.RequestResetPassword WHERE UserId = '"
+                + userId
+                + "'";
+
+            return _dapper.LoadDataSingle<Guid>(userIdSql);
+        }
+
+        public bool UpdateResetPasswordValidityByUserId(Guid userId)
+        {
+            var updateSql =
+                @"Update FruitsStoreBackendSchema.RequestResetPassword  SET  IS_VALID = 'false' WHERE UserId = '"
+                + userId
+                + "'";
+            return _dapper.ExecuteSql(updateSql);
+        }
+
+        public string GetUserEmailByUserId(Guid userId)
+        {
+            string userIdSql =
+                @"SELECT Email FROM FruitsStoreBackendSchema.Users WHERE UserId = '" + userId + "'";
+            return _dapper.LoadDataSingle<string>(userIdSql);
         }
     }
 }
