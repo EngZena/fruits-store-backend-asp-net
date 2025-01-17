@@ -205,7 +205,7 @@ namespace FruitsStoreBackendASPNET.Controllers
             }
             else
             {
-                if (!_authService.IsNumberOfAttemptsWithinLimit(userId))
+                if (!_authService.IsNumberOfAttemptsWithinLimitAndTheGuidIsValid(userId))
                 {
                     return StatusCode(404, "Please try after one hour");
                 }
