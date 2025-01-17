@@ -212,5 +212,57 @@ namespace FruitsStoreBackendASPNET.Controllers
                 return Ok(_authHelper.CreateResetPasswordGUID(userId));
             }
         }
+
+        [HttpPost("SubmitNewPassword/{userGuid}/{userEmail}")]
+        public IActionResult SubmitNewPassword(
+            Guid userGuid,
+            string userEmail,
+            string password,
+            string conformationPassword
+        )
+        {
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+            if (userId != null && Guid.TryParse(userId, out Guid userIdFromGuid))
+            {
+                var ResetPasswordUserGuid = _authService.GetResetPasswordUserGuidByUserId(
+                    userIdFromGuid
+                );
+                if (ResetPasswordUserGuid != userIdFromGuid)
+                {
+                    return StatusCode(404, "The Provided GUID is Invalid");
+                }
+                if (password != conformationPassword)
+                {
+                    return StatusCode(
+                        404,
+                        "There is a mismatch between the password and the confirm passwords."
+                    );
+                }
+                if (_authService.IsNumberOfAttemptsWithinLimitAndTheGuidIsValid(userGuid))
+                {
+                    if (_authService.UpdateResetPasswordValidityByUserId(userIdFromGuid))
+                    {
+                        var userEmail2 = _authService.GetUserEmailByUserId(userGuid);
+                        var userForResetPassword = new UserForSignUpDto(userEmail, password);
+                        if (
+                            !_authHelper.CreateHashPassword(
+                                userForResetPassword,
+                                "SubmitNewPassword",
+                                userEmail
+                            )
+                        )
+                        {
+                            throw new Exception("Failed to Update Password");
+                        }
+                    }
+                }
+                else
+                {
+                    return StatusCode(404, "Please try after one hour");
+                }
+                return Ok("Password updated Successfully");
+            }
+            return StatusCode(401, "Something went wrong");
+        }
     }
 }
