@@ -1,10 +1,13 @@
+using System.Data;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using FruitsStoreBackendASPNET.Data;
+using FruitsStoreBackendASPNET.Dtos;
 using FruitsStoreBackendASPNET.Services;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+using Microsoft.Data.SqlClient;
 using Microsoft.IdentityModel.Tokens;
 
 namespace FruitsStoreBackendASPNET.Helpers
@@ -47,6 +50,58 @@ namespace FruitsStoreBackendASPNET.Helpers
             Guid newToken = new Guid(guidBytes);
             _authService.SaveResetGuidInDataBase(userId, newToken);
             return newToken;
+        }
+
+        public bool CreateHashPassword(
+            UserForSignUpDto userForSignUpDto,
+            string reason,
+            string? userEmail = null
+        )
+        {
+            byte[] passwordSalt = new byte[128 / 8];
+            using (RandomNumberGenerator rng = RandomNumberGenerator.Create())
+            {
+                rng.GetNonZeroBytes(passwordSalt);
+            }
+
+            byte[] passwordHash = GetPasswordHash(userForSignUpDto.Password, passwordSalt);
+            string sqlAddAuth = "";
+            if (reason == "SignUp")
+            {
+                sqlAddAuth =
+                    @"INSERT INTO FruitsStoreBackendSchema.AUTH ([Email],
+                                        [passwordHash],
+                                        [passwordSalt]) VALUES('"
+                    + userForSignUpDto.Email
+                    + "', @passwordHash, @passwordSalt)";
+            }
+            else
+            {
+                sqlAddAuth =
+                    @"Update FruitsStoreBackendSchema.AUTH  SET  passwordHash = @passwordHash
+                    ,  passwordSalt =  @passwordSalt WHERE Email = '"
+                    + userEmail
+                    + "'";
+            }
+
+            List<SqlParameter> SqlParameters = new List<SqlParameter>();
+
+            SqlParameter passwordSaltParameter = new SqlParameter(
+                "@PasswordSalt",
+                SqlDbType.VarBinary
+            );
+            passwordSaltParameter.Value = passwordSalt;
+
+            SqlParameter passwordHashParameter = new SqlParameter(
+                "@PasswordHash",
+                SqlDbType.VarBinary
+            );
+            passwordHashParameter.Value = passwordHash;
+
+            SqlParameters.Add(passwordHashParameter);
+            SqlParameters.Add(passwordSaltParameter);
+
+            return _dapper.ExecuteSqlWithListParameters(sqlAddAuth, SqlParameters);
         }
 
         private string CreateToken(

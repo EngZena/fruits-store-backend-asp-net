@@ -17,5 +17,12 @@ namespace FruitsStoreBackendASPNET.Dtos
 
             Password ??= "";
         }
+
+        public UserForSignUpDto(string UserEmail, string UserPassword)
+        {
+            Email ??= UserEmail;
+
+            Password ??= UserPassword;
+        }
     }
 }
