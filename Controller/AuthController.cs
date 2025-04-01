@@ -21,6 +21,14 @@ namespace FruitsStoreBackendASPNET.Controllers
         private readonly AuthHelper _authHelper = new AuthHelper(configuration);
         private readonly AuthService _authService = new AuthService(configuration);
 
+        /// <summary>
+        /// Creates a new user account using some details
+        /// </summary>
+        /// <remarks>
+        /// This API registers a new user by storing their credentials and associated details
+        /// </remarks>
+        /// <param name="userForRegistrationDto">User registration details</param>
+        /// <returns>Returns a success message if the account is created, or an error if the email is already in use</returns>
         [AllowAnonymous]
         [HttpPost("Register")]
         public IActionResult Register(UserForRegistrationDto userForRegistrationDto)
@@ -114,6 +122,14 @@ namespace FruitsStoreBackendASPNET.Controllers
             );
         }
 
+        /// <summary>
+        /// Creates a new user account using an email and password
+        /// </summary>
+        /// <remarks>
+        /// This API registers a new user
+        /// </remarks>
+        /// <param name="userForSignUpDto">User signup details</param>
+        /// <returns>Returns a success message if the account is created, or an error if the email is already in use</returns>
         [AllowAnonymous]
         [HttpPost("SignUp")]
         public IActionResult SignUp(UserForSignUpDto userForSignUpDto)
@@ -156,6 +172,16 @@ namespace FruitsStoreBackendASPNET.Controllers
             throw new Exception("There is already a user with this email.");
         }
 
+        /// <summary>
+        /// Authenticates a user and generates an access token
+        /// </summary>
+        /// <remarks>
+        /// This API verifies the user's credentials (email and password)
+        /// If authentication is successful, a JWT token is returned for future requests
+        /// </remarks>
+        /// <param name="userForLoginDto">User login credentials</param>
+        /// <returns>Returns a JWT token on successful authentication, or an error for invalid credentials</returns>
+
         [AllowAnonymous]
         [HttpPost("Login")]
         public IActionResult Login(UserForLoginDto userForLoginDto)
@@ -195,6 +221,16 @@ namespace FruitsStoreBackendASPNET.Controllers
             );
         }
 
+        /// <summary>
+        /// Returns a GUID to submit new password
+        /// </summary>
+        /// <remarks>
+        /// This API returns a GUID to submit new password using user Email
+        /// If email is correct, a GUID is returned
+        /// </remarks>
+        /// <param name="userEmail">email@gmail.com</param>
+        /// <returns>Returns a GUID token for correct email, or an error for incorrect email</returns>
+
         [HttpPost("RequestResetPassword")]
         public IActionResult RequestResetPassword(string userEmail)
         {
@@ -212,6 +248,19 @@ namespace FruitsStoreBackendASPNET.Controllers
                 return Ok(_authHelper.CreateResetPasswordGUID(userId));
             }
         }
+
+        /// <summary>
+        /// Submit New Password using secret GUID
+        /// </summary>
+        /// <remarks>
+        /// This API Submit New Password using secret GUID
+        /// If user GUID and new password matching the confirm password then the user password will be changed.
+        /// </remarks>
+        /// <param name="userGuid">00000000-0000-0000-0000-000000000000</param>
+        /// <param name="userEmail">email@gmail.com</param>
+        /// <param name="password">New password</param>
+        /// <param name="conformationPassword">Conformation Password</param>
+        /// <returns>Change user Password if the provided data correct, or an error for incorrect data.</returns>
 
         [HttpPost("SubmitNewPassword/{userGuid}/{userEmail}")]
         public IActionResult SubmitNewPassword(
