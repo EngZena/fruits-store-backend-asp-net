@@ -48,7 +48,7 @@ namespace FruitsStoreBackendASPNET.Repositories
                 return Fruit;
             }
 
-            throw new Exception("Failed to Get User");
+            throw new Exception("Failed to Get Fruit");
         }
 
         public void RemoveEntity<T>(T entityToRemove)
