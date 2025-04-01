@@ -1,3 +1,4 @@
+using System.Reflection;
 using System.Text;
 using FruitsStoreBackendASPNET.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -39,6 +40,9 @@ builder.Services.AddSwaggerGen(c =>
             },
         }
     );
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    c.IncludeXmlComments(xmlPath);
 });
 
 builder.Services.AddScoped<IFruitRepository, FruitRepository>();
