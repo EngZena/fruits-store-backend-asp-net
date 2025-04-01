@@ -22,12 +22,21 @@ namespace FruitsStoreBackendASPNET.Controllers
             })
         );
 
+        /// <summary>
+        /// Retrieves All Fruits
+        /// </summary>
+        /// <returns>A list of fruits.</returns>
         [HttpGet("GetFruits")]
         public IEnumerable<Fruit> GetFruits()
         {
             return _fruitRepository.GetFruits();
         }
 
+        /// <summary>
+        /// Retrieves a specific fruit by Fruit Type
+        /// </summary>
+        /// <param name="FruitType">WINTER_FRUITS</param>
+        /// <returns>The requested fruit if found.</returns>
         [HttpGet("GetFruitsByType/{FruitType}")]
         public IActionResult GetFruitsByType(string FruitType)
         {
@@ -38,18 +47,33 @@ namespace FruitsStoreBackendASPNET.Controllers
             return Ok(_fruitRepository.GetFruitsByType(fruitType));
         }
 
+        /// <summary>
+        /// Retrieves a specific fruit by ID
+        /// </summary>
+        /// <param name="FruitId">00000000-0000-0000-0000-000000000000</param>
+        /// <returns>The requested fruit if found.</returns>
         [HttpGet("GetSingleFruit/{FruitId}")]
+        [ProducesResponseType(typeof(Fruit), 200)] // Success response
         public Fruit GetSingleFruit(Guid FruitId)
         {
             return _fruitRepository.GetSingleFruit(FruitId);
         }
 
+        /// <summary>
+        /// Retrieves all fruits added by User Id
+        /// </summary>
+        /// <param name="UserId">00000000-0000-0000-0000-000000000000</param>
+        /// <returns>The requested fruits added by User Id if found.</returns>
         [HttpGet("GetFruitsCreatedByUserId/{UserId}")]
         public IEnumerable<Fruit> GetFruitsCreatedByUserId(Guid UserId)
         {
             return _fruitRepository.GetFruitsCreatedByUserId(UserId);
         }
 
+        /// <summary>
+        /// Creates New Fruit
+        /// </summary>
+        /// <param name="fruitDto">Fruit object</param>
         [HttpPost("AddFruit")]
         public IActionResult AddFruit(FruitDto fruitDto)
         {
@@ -73,6 +97,10 @@ namespace FruitsStoreBackendASPNET.Controllers
             return BadRequest("Unable to add fruit. User ID not found in the token.");
         }
 
+        /// <summary>
+        /// Updates a specific fruit by ID and details
+        /// </summary>
+        /// <param name="fruit">Fruit object</param>
         [HttpPatch("EditFruit")]
         public IActionResult EditFruit(Fruit fruit)
         {
@@ -92,6 +120,10 @@ namespace FruitsStoreBackendASPNET.Controllers
             throw new Exception("Failed to Get Fruit");
         }
 
+        /// <summary>
+        /// Deletes a specific fruit by ID
+        /// </summary>
+        /// <param name="FruitId">00000000-0000-0000-0000-000000000000</param>
         [HttpDelete("DeleteFruit/{FruitId}")]
         public IActionResult DeleteFruit(Guid FruitId)
         {
