@@ -13,8 +13,12 @@ namespace FruitsStoreBackendASPNET.Services
                 @"SELECT UserId FROM FruitsStoreBackendSchema.Users WHERE Email = '"
                 + userEmail
                 + "'";
-
-            return _dapper.LoadDataSingle<Guid>(userIdSql);
+            var userIdFromDataBase = _dapper.LoadDataSingle<Guid>(userIdSql);
+            if (userIdFromDataBase != Guid.Empty)
+            {
+                return userIdFromDataBase;
+            }
+            return Guid.Empty;
         }
 
         public bool SaveResetGuidInDataBase(Guid userId, Guid resetGuid)
@@ -24,7 +28,10 @@ namespace FruitsStoreBackendASPNET.Services
                 + userId
                 + "'";
             int Number_Of_Attempts = _dapper.LoadDataSingle<int>(SQL_Number_Of_Attempts_And_UserId);
-
+            if (Number_Of_Attempts.GetType() != typeof(int))
+            {
+                return false;
+            }
             var sql_statement =
                 @"IF EXISTS (SELECT Number_Of_Attempts FROM FruitsStoreBackendSchema.RequestResetPassword WHERE UserId = '"
                 + userId
@@ -94,6 +101,10 @@ namespace FruitsStoreBackendASPNET.Services
                     Number_Of_Attempts_And_CreatedAt = _dapper.LoadDataSingle<RequestResetPassword>(
                         SQL_Number_Of_Attempts_And_CreatedAt
                     );
+                    if (Number_Of_Attempts_And_CreatedAt.GetType() == null)
+                    {
+                        return false;
+                    }
                 }
                 return Number_Of_Attempts_And_CreatedAt.Number_Of_Attempts < 5;
             }
@@ -105,8 +116,16 @@ namespace FruitsStoreBackendASPNET.Services
                 @"SELECT UserId FROM FruitsStoreBackendSchema.RequestResetPassword WHERE UserId = '"
                 + userId
                 + "'";
-
-            return _dapper.LoadDataSingle<Guid>(userIdSql);
+            var userIdFromDataBase = _dapper.LoadDataSingle<Guid>(userIdSql);
+            if (userIdFromDataBase == Guid.Empty)
+            {
+                return Guid.Empty;
+            }
+            if (userIdSql != null)
+            {
+                return userIdFromDataBase;
+            }
+            return Guid.Empty;
         }
 
         public bool UpdateResetPasswordValidityByUserId(Guid userId)
@@ -122,7 +141,26 @@ namespace FruitsStoreBackendASPNET.Services
         {
             string userIdSql =
                 @"SELECT Email FROM FruitsStoreBackendSchema.Users WHERE UserId = '" + userId + "'";
-            return _dapper.LoadDataSingle<string>(userIdSql);
+            var userEmail = _dapper.LoadDataSingle<string>(userIdSql);
+            if (userEmail == "" || userEmail == null)
+            {
+                return "user not found";
+            }
+            return userEmail;
+        }
+
+        public Guid GetUserIdByUserGuidId(Guid userGuidId)
+        {
+            string userIdSql =
+                @"SELECT userId FROM FruitsStoreBackendSchema.RequestResetPassword WHERE Reset_GUID = '"
+                + userGuidId
+                + "'";
+            var userId = _dapper.LoadDataSingle<Guid>(userIdSql);
+            if (userId != Guid.Empty)
+            {
+                return userId;
+            }
+            return Guid.Empty;
         }
     }
 }
