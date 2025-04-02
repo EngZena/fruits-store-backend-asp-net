@@ -273,9 +273,17 @@ namespace FruitsStoreBackendASPNET.Controllers
             var userId = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
             if (userId != null && Guid.TryParse(userId, out Guid userIdFromGuid))
             {
+                if (_authService.GetUserIdByUserGuidId(userGuid) == Guid.Empty)
+                {
+                    return StatusCode(404, "The Provided User GUID is Invalid");
+                }
                 var ResetPasswordUserGuid = _authService.GetResetPasswordUserGuidByUserId(
                     userIdFromGuid
                 );
+                if (ResetPasswordUserGuid == Guid.Empty)
+                {
+                    return StatusCode(404, "The Provided User GUID is Invalid");
+                }
                 if (ResetPasswordUserGuid != userIdFromGuid)
                 {
                     return StatusCode(404, "The Provided GUID is Invalid");
@@ -291,13 +299,26 @@ namespace FruitsStoreBackendASPNET.Controllers
                 {
                     if (_authService.UpdateResetPasswordValidityByUserId(userIdFromGuid))
                     {
-                        var userEmail2 = _authService.GetUserEmailByUserId(userGuid);
-                        var userForResetPassword = new UserForSignUpDto(userEmail, password);
+                        var userEmailFromDatabase = _authService.GetUserEmailByUserId(
+                            userIdFromGuid
+                        );
+                        if (userEmailFromDatabase == "user not found")
+                        {
+                            return StatusCode(404, "The Provided User GUID is Invalid");
+                        }
+                        if (userEmail != userEmailFromDatabase)
+                        {
+                            return StatusCode(404, "The Provided Email is Invalid");
+                        }
+                        var userForResetPassword = new UserForSignUpDto(
+                            userEmailFromDatabase,
+                            password
+                        );
                         if (
                             !_authHelper.CreateHashPassword(
                                 userForResetPassword,
                                 "SubmitNewPassword",
-                                userEmail
+                                userEmailFromDatabase
                             )
                         )
                         {
