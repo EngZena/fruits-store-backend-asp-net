@@ -1,6 +1,6 @@
-using FruitsStoreBackendASPNET.Enums;
+using fruits_store_backend_asp_net.Enums;
 
-namespace FruitsStoreBackendASPNET.Dtos
+namespace fruits_store_backend_asp_net.Dtos
 {
     public partial class FruitDto
     {
@@ -26,19 +26,5 @@ namespace FruitsStoreBackendASPNET.Dtos
         /// The image of the fruit
         /// </summary>
         public required string ImageBase64 { get; set; }
-
-        /// <summary>
-        /// The user Id while adding new Fruit
-        /// </summary>
-        /// <example>00000000-0000-0000-0000-000000000000</example>
-
-        public Guid AddedBy { get; set; }
-
-        /// <summary>
-        /// The time for creation new fruit
-        /// </summary>
-        /// <example>2025-03-11T00:29:58.671Z</example>
-
-        public DateTime CreatedAt { get; set; }
     }
 }

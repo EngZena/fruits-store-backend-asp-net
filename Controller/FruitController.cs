@@ -1,12 +1,12 @@
 using AutoMapper;
-using FruitsStoreBackendASPNET.Dtos;
-using FruitsStoreBackendASPNET.Enums;
-using FruitsStoreBackendASPNET.Models;
-using FruitsStoreBackendASPNET.Repositories;
+using fruits_store_backend_asp_net.Dtos;
+using fruits_store_backend_asp_net.Enums;
+using fruits_store_backend_asp_net.Models;
+using fruits_store_backend_asp_net.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace FruitsStoreBackendASPNET.Controllers
+namespace fruits_store_backend_asp_net.Controllers
 {
     [Authorize]
     [ApiController]
@@ -80,8 +80,8 @@ namespace FruitsStoreBackendASPNET.Controllers
             var userId = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
             if (userId != null && Guid.TryParse(userId, out Guid userGuid))
             {
-                fruitDto.AddedBy = userGuid;
                 Fruit fruit = _mapper.Map<Fruit>(fruitDto);
+                fruit.AddedBy = userGuid;
                 fruit.CreatedAt = DateTime.UtcNow;
                 fruit.UpdatedAt = DateTime.UtcNow;
                 if (!Enum.IsDefined(typeof(FruitType), fruit.FruitType))

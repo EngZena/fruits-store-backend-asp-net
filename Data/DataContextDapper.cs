@@ -2,7 +2,7 @@ using System.Data;
 using Dapper;
 using Microsoft.Data.SqlClient;
 
-namespace FruitsStoreBackendASPNET.Data
+namespace fruits_store_backend_asp_net.Data
 {
     public class DataContextDapper(IConfiguration configuration)
     {

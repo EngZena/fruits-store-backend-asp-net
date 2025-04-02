@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace FruitsStoreBackendASPNET.Enums
+namespace fruits_store_backend_asp_net.Enums
 {
     /// <summary>
     /// Represents the type of the fruit.

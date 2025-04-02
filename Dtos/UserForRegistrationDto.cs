@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
-using FruitsStoreBackendASPNET.Enums;
+using fruits_store_backend_asp_net.Enums;
 
-namespace FruitsStoreBackendASPNET.Dtos
+namespace fruits_store_backend_asp_net.Dtos
 {
     public partial class UserForRegistrationDto
     {
