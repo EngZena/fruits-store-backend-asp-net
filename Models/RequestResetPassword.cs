@@ -1,6 +1,4 @@
-using FruitsStoreBackendASPNET.Enums;
-
-namespace FruitsStoreBackendASPNET.Models
+namespace fruits_store_backend_asp_net.Models
 {
     public partial class RequestResetPassword
     {

@@ -1,8 +1,8 @@
-using FruitsStoreBackendASPNET.Data;
-using FruitsStoreBackendASPNET.Enums;
-using FruitsStoreBackendASPNET.Models;
+using fruits_store_backend_asp_net.Data;
+using fruits_store_backend_asp_net.Enums;
+using fruits_store_backend_asp_net.Models;
 
-namespace FruitsStoreBackendASPNET.Repositories
+namespace fruits_store_backend_asp_net.Repositories
 {
     public class FruitRepository(IConfiguration config) : IFruitRepository
     {
