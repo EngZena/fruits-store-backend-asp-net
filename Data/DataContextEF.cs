@@ -1,7 +1,7 @@
-using FruitsStoreBackendASPNET.Models;
+using fruits_store_backend_asp_net.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace FruitsStoreBackendASPNET.Data
+namespace fruits_store_backend_asp_net.Data
 {
     public class DataContextEF : DbContext
     {

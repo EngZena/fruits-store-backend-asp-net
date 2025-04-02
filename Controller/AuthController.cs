@@ -1,15 +1,15 @@
 using System.Data;
 using System.Security.Cryptography;
-using FruitsStoreBackendASPNET.Data;
-using FruitsStoreBackendASPNET.Dtos;
-using FruitsStoreBackendASPNET.Helpers;
-using FruitsStoreBackendASPNET.Models;
-using FruitsStoreBackendASPNET.Services;
+using fruits_store_backend_asp_net.Data;
+using fruits_store_backend_asp_net.Dtos;
+using fruits_store_backend_asp_net.Helpers;
+using fruits_store_backend_asp_net.Models;
+using fruits_store_backend_asp_net.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 
-namespace FruitsStoreBackendASPNET.Controllers
+namespace fruits_store_backend_asp_net.Controllers
 {
     [Authorize]
     [ApiController]

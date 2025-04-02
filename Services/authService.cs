@@ -1,7 +1,7 @@
-using FruitsStoreBackendASPNET.Data;
-using FruitsStoreBackendASPNET.Models;
+using fruits_store_backend_asp_net.Data;
+using fruits_store_backend_asp_net.Models;
 
-namespace FruitsStoreBackendASPNET.Services
+namespace fruits_store_backend_asp_net.Services
 {
     public class AuthService(IConfiguration configuration)
     {

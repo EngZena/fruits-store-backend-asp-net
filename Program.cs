@@ -1,6 +1,6 @@
 using System.Reflection;
 using System.Text;
-using FruitsStoreBackendASPNET.Repositories;
+using fruits_store_backend_asp_net.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 

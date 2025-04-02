@@ -3,14 +3,14 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using FruitsStoreBackendASPNET.Data;
-using FruitsStoreBackendASPNET.Dtos;
-using FruitsStoreBackendASPNET.Services;
+using fruits_store_backend_asp_net.Data;
+using fruits_store_backend_asp_net.Dtos;
+using fruits_store_backend_asp_net.Services;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.Data.SqlClient;
 using Microsoft.IdentityModel.Tokens;
 
-namespace FruitsStoreBackendASPNET.Helpers
+namespace fruits_store_backend_asp_net.Helpers
 {
     public class AuthHelper(IConfiguration configuration)
     {
