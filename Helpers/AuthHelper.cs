@@ -48,8 +48,11 @@ namespace FruitsStoreBackendASPNET.Helpers
             byte[] guidBytes = new byte[16];
             Array.Copy(hash, guidBytes, 16);
             Guid newToken = new Guid(guidBytes);
-            _authService.SaveResetGuidInDataBase(userId, newToken);
-            return newToken;
+            if (_authService.SaveResetGuidInDataBase(userId, newToken))
+            {
+                return newToken;
+            }
+            throw new Exception("Failed to Create Reset Password Guid");
         }
 
         public bool CreateHashPassword(
