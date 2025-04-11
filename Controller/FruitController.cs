@@ -71,6 +71,20 @@ namespace fruits_store_backend_asp_net.Controllers
         }
 
         /// <summary>
+        /// Retrieves all fruits added by Current User
+        /// </summary>
+        [HttpGet("GetFruitsCreatedByCurrentUser")]
+        public IEnumerable<Fruit> GetFruitsCreatedByCurrentUser()
+        {
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+            if (userId != null && Guid.TryParse(userId, out Guid userGuid))
+            {
+                return _fruitRepository.GetFruitsCreatedByUserId(userGuid);
+            }
+            throw new Exception("Failed to Get Fruit");
+        }
+
+        /// <summary>
         /// Creates New Fruit
         /// </summary>
         /// <param name="fruitDto">Fruit object</param>
