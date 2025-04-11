@@ -83,7 +83,6 @@ namespace fruits_store_backend_asp_net.Controllers
                 Fruit fruit = _mapper.Map<Fruit>(fruitDto);
                 fruit.AddedBy = userGuid;
                 fruit.CreatedAt = DateTime.UtcNow;
-                fruit.UpdatedAt = DateTime.UtcNow;
                 if (!Enum.IsDefined(typeof(FruitType), fruit.FruitType))
                 {
                     return BadRequest("Invalid fruit type.");
@@ -100,22 +99,32 @@ namespace fruits_store_backend_asp_net.Controllers
         /// <summary>
         /// Updates a specific fruit by ID and details
         /// </summary>
-        /// <param name="fruit">Fruit object</param>
+        /// <param name="editFruitDto">Fruit object</param>
         [HttpPatch("EditFruit")]
-        public IActionResult EditFruit(Fruit fruit)
+        public IActionResult EditFruit(EditFruitDto editFruitDto)
         {
-            Fruit? fruitDb = _fruitRepository.GetSingleFruit(fruit.FruitId);
-            if (fruitDb != null)
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+            if (userId != null && Guid.TryParse(userId, out Guid userGuid))
             {
-                fruitDb.Name = fruit.Name;
-                fruitDb.FruitType = fruit.FruitType;
-                fruitDb.Price = fruit.Price;
-                fruitDb.ImageBase64 = fruit.ImageBase64;
-                if (_fruitRepository.SaveChanges())
+                Fruit? fruitDb = _fruitRepository.GetSingleFruit(editFruitDto.FruitId);
+                if (fruitDb != null)
                 {
-                    return Ok("Fruit updated successfully!");
+                    fruitDb.Name = editFruitDto.Name;
+                    fruitDb.FruitType = editFruitDto.FruitType;
+                    fruitDb.Price = editFruitDto.Price;
+                    fruitDb.ImageBase64 = editFruitDto.ImageBase64;
+                    fruitDb.UpdatedAt = DateTime.UtcNow;
+                    fruitDb.UpdatedBy = userGuid;
+                    if (_fruitRepository.SaveChanges())
+                    {
+                        return Ok("Fruit updated successfully!");
+                    }
+                    throw new Exception("Failed to Update Fruit");
                 }
-                throw new Exception("Failed to Update Fruit");
+            }
+            else
+            {
+                return BadRequest("Unable to add fruit. User ID not found in the token.");
             }
             throw new Exception("Failed to Get Fruit");
         }
