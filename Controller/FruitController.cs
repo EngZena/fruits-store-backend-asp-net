@@ -71,6 +71,20 @@ namespace fruits_store_backend_asp_net.Controllers
         }
 
         /// <summary>
+        /// Retrieves all fruits added by Current User
+        /// </summary>
+        [HttpGet("GetFruitsCreatedByCurrentUser")]
+        public IEnumerable<Fruit> GetFruitsCreatedByCurrentUser()
+        {
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+            if (userId != null && Guid.TryParse(userId, out Guid userGuid))
+            {
+                return _fruitRepository.GetFruitsCreatedByUserId(userGuid);
+            }
+            throw new Exception("Failed to Get Fruit");
+        }
+
+        /// <summary>
         /// Creates New Fruit
         /// </summary>
         /// <param name="fruitDto">Fruit object</param>
@@ -130,7 +144,7 @@ namespace fruits_store_backend_asp_net.Controllers
         }
 
         /// <summary>
-        /// Deletes a specific fruit by ID
+        /// Deletes a specific fruit by its ID, but only if it was added by the currently logged-in user
         /// </summary>
         /// <param name="FruitId">00000000-0000-0000-0000-000000000000</param>
         [HttpDelete("DeleteFruit/{FruitId}")]
@@ -139,13 +153,23 @@ namespace fruits_store_backend_asp_net.Controllers
             Fruit? fruitDb = _fruitRepository.GetSingleFruit(FruitId);
             if (fruitDb != null)
             {
-                _fruitRepository.RemoveEntity<Fruit>(fruitDb);
-
-                if (_fruitRepository.SaveChanges())
+                var userId = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+                if (userId != null && Guid.TryParse(userId, out Guid userGuid))
                 {
-                    return Ok("Fruit deleted successfully!");
+                    if (userGuid != fruitDb.AddedBy)
+                    {
+                        return BadRequest(
+                            "Unable to delete fruit. You can only remove fruits that you have added yourself."
+                        );
+                    }
+                    _fruitRepository.RemoveEntity<Fruit>(fruitDb);
+
+                    if (_fruitRepository.SaveChanges())
+                    {
+                        return Ok("Fruit deleted successfully!");
+                    }
+                    throw new Exception("Failed to Delete Fruit");
                 }
-                throw new Exception("Failed to Delete Fruit");
             }
             throw new Exception("Failed to Get Fruit");
         }
