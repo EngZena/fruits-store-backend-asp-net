@@ -33,7 +33,7 @@ namespace fruits_store_backend_asp_net.Controllers
         }
 
         /// <summary>
-        /// Retrieves a specific fruit by Fruit Type
+        /// Retrieves fruits by Fruit Type
         /// </summary>
         /// <param name="FruitType">WINTER_FRUITS</param>
         /// <returns>The requested fruit if found.</returns>
@@ -144,7 +144,7 @@ namespace fruits_store_backend_asp_net.Controllers
         }
 
         /// <summary>
-        /// Deletes a specific fruit by its ID, but only if it was added by the currently logged-in user
+        /// Delete a fruit added by the current user using the fruit ID
         /// </summary>
         /// <param name="FruitId">00000000-0000-0000-0000-000000000000</param>
         [HttpDelete("DeleteFruit/{FruitId}")]
