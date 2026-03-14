@@ -8,7 +8,7 @@ namespace fruits_store_backend_asp_net.Dtos
         /// The name of the fruit
         /// </summary>
         /// <example>Apple</example>
-        public required string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
 
         /// <summary>
         /// The price of the fruit
@@ -25,6 +25,6 @@ namespace fruits_store_backend_asp_net.Dtos
         /// <summary>
         /// The image of the fruit
         /// </summary>
-        public required string ImageBase64 { get; set; }
+        public string ImageBase64 { get; set; } = string.Empty;
     }
 }
