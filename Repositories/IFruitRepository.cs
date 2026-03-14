@@ -5,17 +5,18 @@ namespace fruits_store_backend_asp_net.Repositories
 {
     public interface IFruitRepository
     {
-        public bool SaveChanges();
+        public Task<bool> SaveChanges();
 
-        public bool AddEntity<T>(T entityToAdd);
+        public Task<bool> AddFruit<T>(T entityToAdd);
+        public bool EditFruit<T>(T entityToAdd);
 
         public void RemoveEntity<T>(T entityToRemove);
 
-        public IEnumerable<Fruit> GetFruits();
-        public IEnumerable<Fruit> GetFruitsByType(FruitType FruitTypeId);
+        public Task<IEnumerable<Fruit>> GetFruits();
+        public Task<IEnumerable<Fruit>> GetFruitsByType(FruitType FruitTypeId);
 
-        public IEnumerable<Fruit> GetFruitsCreatedByUserId(Guid UserId);
+        public Task<IEnumerable<Fruit>> GetFruitsCreatedByUserId(Guid UserId);
 
-        public Fruit GetSingleFruit(Guid FruitId);
+        public Task<Fruit> GetSingleFruit(Guid FruitId);
     }
 }
