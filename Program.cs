@@ -1,6 +1,7 @@
 using System.Reflection;
 using System.Text;
 using fruits_store_backend_asp_net.Repositories;
+using fruits_store_backend_asp_net.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 
@@ -45,6 +46,7 @@ builder.Services.AddSwaggerGen(c =>
     c.IncludeXmlComments(xmlPath);
 });
 
+builder.Services.AddScoped<IFruitService, FruitService>();
 builder.Services.AddScoped<IFruitRepository, FruitRepository>();
 
 string? tokenKeyString = builder.Configuration.GetSection("AppSettings:TokenKey").Value;
