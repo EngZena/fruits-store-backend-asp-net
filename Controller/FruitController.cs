@@ -3,6 +3,7 @@ using fruits_store_backend_asp_net.Dtos;
 using fruits_store_backend_asp_net.Enums;
 using fruits_store_backend_asp_net.Models;
 using fruits_store_backend_asp_net.Repositories;
+using fruits_store_backend_asp_net.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,9 +12,11 @@ namespace fruits_store_backend_asp_net.Controllers
     [Authorize]
     [ApiController]
     [Route("[controller]")]
-    public class FruitController(IFruitRepository fruitRepository) : ControllerBase
+    public class FruitController(IFruitRepository fruitRepository, IFruitService fruitService)
+        : ControllerBase
     {
         IFruitRepository _fruitRepository = fruitRepository;
+        IFruitService _fruitService = fruitService;
 
         IMapper _mapper = new Mapper(
             new MapperConfiguration(cfg =>
@@ -27,9 +30,9 @@ namespace fruits_store_backend_asp_net.Controllers
         /// </summary>
         /// <returns>A list of fruits.</returns>
         [HttpGet("GetFruits")]
-        public IEnumerable<Fruit> GetFruits()
+        public async Task<IEnumerable<Fruit>> GetFruits()
         {
-            return _fruitRepository.GetFruits();
+            return await _fruitService.GetFruits();
         }
 
         /// <summary>
@@ -38,13 +41,13 @@ namespace fruits_store_backend_asp_net.Controllers
         /// <param name="FruitType">WINTER_FRUITS</param>
         /// <returns>The requested fruit if found.</returns>
         [HttpGet("GetFruitsByType/{FruitType}")]
-        public IActionResult GetFruitsByType(string FruitType)
+        public async Task<IActionResult> GetFruitsByType(string FruitType)
         {
             if (!Enum.TryParse<FruitType>(FruitType, true, out var fruitType))
             {
                 return BadRequest("Invalid fruit type provided.");
             }
-            return Ok(_fruitRepository.GetFruitsByType(fruitType));
+            return Ok(await _fruitService.GetFruitsByType(fruitType));
         }
 
         /// <summary>
@@ -54,9 +57,9 @@ namespace fruits_store_backend_asp_net.Controllers
         /// <returns>The requested fruit if found.</returns>
         [HttpGet("GetSingleFruit/{FruitId}")]
         [ProducesResponseType(typeof(Fruit), 200)] // Success response
-        public Fruit GetSingleFruit(Guid FruitId)
+        public async Task<Fruit> GetSingleFruit(Guid FruitId)
         {
-            return _fruitRepository.GetSingleFruit(FruitId);
+            return await _fruitService.GetSingleFruit(FruitId);
         }
 
         /// <summary>
@@ -65,21 +68,21 @@ namespace fruits_store_backend_asp_net.Controllers
         /// <param name="UserId">00000000-0000-0000-0000-000000000000</param>
         /// <returns>The requested fruits added by User Id if found.</returns>
         [HttpGet("GetFruitsCreatedByUserId/{UserId}")]
-        public IEnumerable<Fruit> GetFruitsCreatedByUserId(Guid UserId)
+        public async Task<IEnumerable<Fruit>> GetFruitsCreatedByUserId(Guid UserId)
         {
-            return _fruitRepository.GetFruitsCreatedByUserId(UserId);
+            return await _fruitService.GetFruitsCreatedByUserId(UserId);
         }
 
         /// <summary>
         /// Retrieves all fruits added by Current User
         /// </summary>
         [HttpGet("GetFruitsCreatedByCurrentUser")]
-        public IEnumerable<Fruit> GetFruitsCreatedByCurrentUser()
+        public async Task<IEnumerable<Fruit>> GetFruitsCreatedByCurrentUser()
         {
             var userId = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
             if (userId != null && Guid.TryParse(userId, out Guid userGuid))
             {
-                return _fruitRepository.GetFruitsCreatedByUserId(userGuid);
+                return await _fruitService.GetFruitsCreatedByUserId(userGuid);
             }
             throw new Exception("Failed to Get Fruit");
         }
@@ -89,25 +92,29 @@ namespace fruits_store_backend_asp_net.Controllers
         /// </summary>
         /// <param name="fruitDto">Fruit object</param>
         [HttpPost("AddFruit")]
-        public IActionResult AddFruit(FruitDto fruitDto)
+        public async Task<IActionResult> AddFruit(FruitDto fruitDto)
         {
-            var userId = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
-            if (userId != null && Guid.TryParse(userId, out Guid userGuid))
+            try
             {
-                Fruit fruit = _mapper.Map<Fruit>(fruitDto);
-                fruit.AddedBy = userGuid;
-                fruit.CreatedAt = DateTime.UtcNow;
-                if (!Enum.IsDefined(typeof(FruitType), fruit.FruitType))
+                var userId = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+                if (userId != null && Guid.TryParse(userId, out Guid userGuid))
                 {
-                    return BadRequest("Invalid fruit type.");
+                    var (success, details) = await _fruitService.AddFruit(fruitDto, userGuid);
+                    if (success)
+                    {
+                        return Ok("Fruit added successfully");
+                    }
+                    else
+                    {
+                        return BadRequest($"{details}");
+                    }
                 }
-                if (_fruitRepository.AddEntity(fruit))
-                {
-                    return Ok("Fruit added successfully!");
-                }
+                return BadRequest("Unable to add fruit. User ID not found in the token.");
             }
-
-            return BadRequest("Unable to add fruit. User ID not found in the token.");
+            catch (Exception exception)
+            {
+                throw new Exception($"Unable to add fruit. {exception}");
+            }
         }
 
         /// <summary>
@@ -115,32 +122,26 @@ namespace fruits_store_backend_asp_net.Controllers
         /// </summary>
         /// <param name="editFruitDto">Fruit object</param>
         [HttpPatch("EditFruit")]
-        public IActionResult EditFruit(EditFruitDto editFruitDto)
+        public async Task<IActionResult> EditFruit(EditFruitDto editFruitDto)
         {
             var userId = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
             if (userId != null && Guid.TryParse(userId, out Guid userGuid))
             {
-                Fruit? fruitDb = _fruitRepository.GetSingleFruit(editFruitDto.FruitId);
-                if (fruitDb != null)
+                var (success, details) = await _fruitService.EditFruit(editFruitDto, userGuid);
+                if (success)
                 {
-                    fruitDb.Name = editFruitDto.Name;
-                    fruitDb.FruitType = editFruitDto.FruitType;
-                    fruitDb.Price = editFruitDto.Price;
-                    fruitDb.ImageBase64 = editFruitDto.ImageBase64;
-                    fruitDb.UpdatedAt = DateTime.UtcNow;
-                    fruitDb.UpdatedBy = userGuid;
-                    if (_fruitRepository.SaveChanges())
-                    {
-                        return Ok("Fruit updated successfully!");
-                    }
-                    throw new Exception("Failed to Update Fruit");
+                    return Ok("Fruit updated successfully");
+                }
+                else
+                {
+                    return BadRequest($"{details}");
                 }
             }
             else
             {
-                return BadRequest("Unable to add fruit. User ID not found in the token.");
+                return BadRequest("Unable to update fruit. User ID not found in the token.");
             }
-            throw new Exception("Failed to Get Fruit");
+            throw new Exception("Failed to update Fruit");
         }
 
         /// <summary>
@@ -148,30 +149,22 @@ namespace fruits_store_backend_asp_net.Controllers
         /// </summary>
         /// <param name="FruitId">00000000-0000-0000-0000-000000000000</param>
         [HttpDelete("DeleteFruit/{FruitId}")]
-        public IActionResult DeleteFruit(Guid FruitId)
+        public async Task<IActionResult> DeleteFruit(Guid FruitId)
         {
-            Fruit? fruitDb = _fruitRepository.GetSingleFruit(FruitId);
-            if (fruitDb != null)
+            var userId = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
+            if (userId != null && Guid.TryParse(userId, out Guid userGuid))
             {
-                var userId = User.Claims.FirstOrDefault(c => c.Type == "userId")?.Value;
-                if (userId != null && Guid.TryParse(userId, out Guid userGuid))
+                var (success, details) = await _fruitService.DeleteFruit(FruitId, userGuid);
+                if (success)
                 {
-                    if (userGuid != fruitDb.AddedBy)
-                    {
-                        return BadRequest(
-                            "Unable to delete fruit. You can only remove fruits that you have added yourself."
-                        );
-                    }
-                    _fruitRepository.RemoveEntity<Fruit>(fruitDb);
-
-                    if (_fruitRepository.SaveChanges())
-                    {
-                        return Ok("Fruit deleted successfully!");
-                    }
-                    throw new Exception("Failed to Delete Fruit");
+                    return Ok("Fruit deleted successfully");
+                }
+                else
+                {
+                    return BadRequest($"{details}");
                 }
             }
-            throw new Exception("Failed to Get Fruit");
+            return BadRequest("Unable to delete fruit. User ID not found in the token.");
         }
     }
 }
